@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>尾牙抽獎系統</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      text-align: center;
+      background: radial-gradient(circle at top, #fff, #f2f2f2);
+      padding-top: 60px;
+    }
+    h1 {
+      font-size: 52px;
+      margin-bottom: 20px;
+    }
+    button {
+      font-size: 24px;
+      padding: 15px 35px;
+      margin: 15px;
+      cursor: pointer;
+    }
+    #mode {
+      font-size: 22px;
+      margin-top: 10px;
+      color: #555;
+    }
+    #result {
+      font-size: 70px;
+      margin: 50px 0;
+      color: #c62828;
+      min-height: 90px;
+    }
+    #log {
+      margin-top: 40px;
+      font-size: 18px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎉 尾牙抽獎 🎉</h1>
+
+<div id="mode">一般抽獎（抽過不再抽）</div>
+<div id="result">請按下抽獎</div>
+
+<button onclick="normalDraw()">🎰 一般抽獎</button>
+<button onclick="bonusDraw()">✨ 加碼獎（全員可抽）</button>
+<br>
+<button onclick="resetDraw()">🔄 全部重置</button>
+
+<div id="log"></div>
+
+<script>
+  // 原始名單（不顯示）
+  const originalPeople = [
+    "林綺慧","陳韋伶","林紫瑩","袁宇瑄",
+    "黃郁綾","李貞璇","張詠絜","陳婷","李國齊","莊明春","黃龍月","王盈惠","陳俐雯","游筱柔","賈維倫","王信偉","施蓉幸","黃千凡","林純如","吳昇達","林芊妤","陳威霖","曾鈺婷","李孟樺","李婉瑛","陳惠琴","陳曉佩","王菀柔","曾雪倩","郭宇仁"
+  ];
+
+  // 一般抽獎池（會移除）
+  let remainingPeople = [...originalPeople];
+
+  let normalWinners = [];
+  let bonusWinners = [];
+
+  function animateDraw(list, callback) {
+    let count = 0;
+    const interval = setInterval(() => {
+      const temp = list[Math.floor(Math.random() * list.length)];
+      document.getElementById("result").innerText = temp;
+      count++;
+      if (count > 20) {
+        clearInterval(interval);
+        callback();
+      }
+    }, 100);
+  }
+
+  function normalDraw() {
+    if (remainingPeople.length === 0) {
+      document.getElementById("result").innerText = "🎊 一般獎已抽完 🎊";
+      return;
+    }
+    document.getElementById("mode").innerText = "一般抽獎（抽過不再抽）";
+
+    animateDraw(remainingPeople, () => {
+      const index = Math.floor(Math.random() * remainingPeople.length);
+      const winner = remainingPeople.splice(index, 1)[0];
+      normalWinners.push(winner);
+      document.getElementById("result").innerText = winner;
+      updateLog();
+    });
+  }
+
+  function bonusDraw() {
+    document.getElementById("mode").innerText = "✨ 加碼獎（全員可抽，不影響前面機率）";
+
+    animateDraw(originalPeople, () => {
+      const winner = originalPeople[Math.floor(Math.random() * originalPeople.length)];
+      bonusWinners.push(winner);
+      document.getElementById("result").innerText = winner;
+      updateLog();
+    });
+  }
+
+  function updateLog() {
+    const logDiv = document.getElementById("log");
+    logDiv.innerHTML = "<h3>🎁 中獎紀錄</h3>";
+
+    if (normalWinners.length > 0) {
+      logDiv.innerHTML += "<strong>一般獎</strong><br>";
+      normalWinners.forEach(name => {
+        logDiv.innerHTML += name + "<br>";
+      });
+    }
+
+    if (bonusWinners.length > 0) {
+      logDiv.innerHTML += "<br><strong>✨ 加碼獎</strong><br>";
+      bonusWinners.forEach(name => {
+        logDiv.innerHTML += name + "<br>";
+      });
+    }
+  }
+
+  function resetDraw() {
+    remainingPeople = [...originalPeople];
+    normalWinners = [];
+    bonusWinners = [];
+    document.getElementById("mode").innerText = "一般抽獎（抽過不再抽）";
+    document.getElementById("result").innerText = "請按下抽獎";
+    document.getElementById("log").innerHTML = "";
+  }
+</script>
+
+</body>
+</html>
